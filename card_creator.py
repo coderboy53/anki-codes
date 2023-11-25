@@ -5,10 +5,7 @@ import urllib
 import os
 from anki.storage import Collection
 
-
-import json
 import pandas as pd
-import html5lib
 
 import inflections as inf
 
@@ -27,7 +24,6 @@ class CardCreator:
         total_soup = BeautifulSoup(page_html,'html.parser')
         # get the type of word being fetched, what verb, what adjective
         word_type = ' '.join(total_soup.find('div',{'class':'meaning-tags'}).get_text().split()[:2])
-        print(word_type)
         if word_type.split()[1] == 'verb':
             if word_type == 'Godan verb':
                 dict = inf.godan_inflections(self.keyword)
@@ -40,19 +36,28 @@ class CardCreator:
             col.decks.current()['mid'] = modelVerb['id']
             note = col.new_note(modelVerb)
             field = 0
-            print(len(note.fields))
             for i in dict.keys():
                 note.fields[field] = dict[i]
                 field += 1
             note.fields[field] = self.meaning
             col.add_note(note, deck['id'])
-
-        elif word_type == 'I-adjective (keiyoushi)':
-            dict = inf.i_inflections(self.keyword)
-            pass
-        elif word_type == 'Na-adjective (keiyodoshi),':
-            dict = inf.na_inflections(self.keyword)
-            pass
+        if 'adjective' in word_type:
+            if word_type == 'I-adjective (keiyoushi)':
+                dict = inf.i_inflections(self.keyword)
+                deck = col.decks.by_name('Genki 1 - い adjectives')
+            elif word_type == 'Na-adjective (keiyodoshi),':
+                dict = inf.na_inflections(self.keyword)
+                deck = col.decks.by_name('Genki 1 - な adjectives')
+            modelAdj = col.models.by_name('Adjectives')
+            col.decks.select(deck['id'])
+            col.decks.current()['mid'] = modelAdj['id']
+            note = col.new_note(modelAdj)
+            field = 0
+            for i in dict.keys():
+                note.fields[field] = dict[i]
+                field += 1
+            note.fields[field] = self.meaning
+            col.add_note(note, deck['id'])
 
     
 
