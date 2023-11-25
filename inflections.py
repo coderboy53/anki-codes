@@ -1,4 +1,3 @@
-
 adj_fields = {'dictionary':'','non_past':'','non_past_pol':'','non_past_neg':'','non_past_pol_neg':'',
                 'past':'','past_pol':'','past_neg':'','past_pol_neg':''}
 
@@ -53,8 +52,14 @@ def ichidan_inflections(keyword):
     verb_fields['dictionary'] = keyword
     verb_fields['non_past'] = keyword
     verb_fields['non_past_pol'] = keyword[:-1]+'ます'
-    verb_fields
-    pass
+    verb_fields['non_past_neg'] = keyword[:-1]+'ない'
+    verb_fields['non_past_pol_neg'] = keyword[:-1]+'ません'
+    verb_fields['past'] = keyword[:-1]+'た'
+    verb_fields['past_pol'] = keyword[:-1]+'ました'
+    verb_fields['past_neg'] = keyword[:-1]+'なかった'
+    verb_fields['past_pol_neg'] = keyword[:-1]+'ませんでした'
+    verb_fields['te'] = keyword[:-1]+'て'
+    return verb_fields
 
 def i_inflections(keyword):
     adj_fields['dictionary'] = keyword
