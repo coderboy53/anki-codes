@@ -1,8 +1,11 @@
+#!/usr/bin/env python3
 import urllib.request as urllib2
 from bs4 import BeautifulSoup
 import urllib
 
 import os
+import argparse
+
 from anki.storage import Collection
 
 import pandas as pd
@@ -24,11 +27,12 @@ class CardCreator:
         total_soup = BeautifulSoup(page_html,'html.parser')
         # get the type of word being fetched, what verb, what adjective
         word_type = ' '.join(total_soup.find('div',{'class':'meaning-tags'}).get_text().split()[:2])
-        if word_type.split()[1] == 'verb':
+        print(word_type)
+        if 'verb' in word_type:
             if word_type == 'Godan verb':
                 dict = inf.godan_inflections(self.keyword)
                 deck = col.decks.by_name('Genki 1 - Godan verbs')
-            elif word_type == 'Ichidan verb':
+            elif word_type == 'Ichidan verb,':
                 dict = inf.ichidan_inflections(self.keyword)
                 deck = col.decks.by_name('Genki 1 - Ichidan verbs')
             modelVerb = col.models.by_name('Verbs')
@@ -60,8 +64,8 @@ class CardCreator:
             col.add_note(note, deck['id'])
 
     
-
-keyword = input('Enter the keyword to conjugate\n')
-meaning = input('Enter the meaning\n')
-p1 = CardCreator(keyword=keyword, meaning=meaning)
-p1.create()
+if __name__ == '__main__':
+    keyword = input('Enter the keyword to conjugate\n')
+    meaning = input('Enter the meaning\n')
+    p1 = CardCreator(keyword=keyword, meaning=meaning)
+    p1.create()
