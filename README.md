@@ -4,7 +4,7 @@ These are a bunch of python scripts made for making the process of generating no
 
 ## Work to-do yet in note-creator
 
-[ ] Add CLI
+[x] Add CLI
 [ ] Add error handling
 [ ] Add feature of inputting vocabulary using text or csv files
 [ ] Add other note type addition features
