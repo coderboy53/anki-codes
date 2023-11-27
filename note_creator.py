@@ -65,7 +65,12 @@ class CardCreator:
 
     
 if __name__ == '__main__':
-    keyword = input('Enter the keyword to conjugate\n')
-    meaning = input('Enter the meaning\n')
-    p1 = CardCreator(keyword=keyword, meaning=meaning)
+    parser = argparse.ArgumentParser(description='Create notes for the entered japanese vocabulary in Anki')
+    parser.add_argument('keyword', help='Keyword to create notes on')
+    parser.add_argument('meaning', help='Meaning of the keyword')
+    # keyword = input('Enter the keyword to conjugate\n')
+    # meaning = input('Enter the meaning\n')
+    args = parser.parse_args()
+    p1 = CardCreator(keyword=args.keyword, meaning=args.meaning)
     p1.create()
+    # print(args.keyword, args.meaning)
