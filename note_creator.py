@@ -12,6 +12,8 @@ import pandas as pd
 
 import inflections as inf
 
+import furigana_gen as fg
+
 anki_home = '/home/kokurou/.local/share/Anki2/User 1'
 anki_collection_path = os.path.join(anki_home,'collection.anki2')
 col = Collection(anki_collection_path)
@@ -27,47 +29,69 @@ class CardCreator:
         total_soup = BeautifulSoup(page_html,'html.parser')
         # get the type of word being fetched, what verb, what adjective
         word_type = ' '.join(total_soup.find('div',{'class':'meaning-tags'}).get_text().split()[:2])
-        print(word_type)
         if 'verb' in word_type:
+            print("verb")
+            deck = col.decks.by_name('Genki - Verbs')
             if word_type == 'Godan verb':
                 dict = inf.godan_inflections(self.keyword)
-                deck = col.decks.by_name('Genki 1 - Godan verbs')
             elif word_type == 'Ichidan verb,':
                 dict = inf.ichidan_inflections(self.keyword)
-                deck = col.decks.by_name('Genki 1 - Ichidan verbs')
             modelVerb = col.models.by_name('Verbs')
             col.decks.select(deck['id'])
             col.decks.current()['mid'] = modelVerb['id']
             note = col.new_note(modelVerb)
             field = 0
             for i in dict.keys():
-                note.fields[field] = dict[i]
+                note.fields[field] = fg.add_furigana(dict[i])
                 field += 1
             note.fields[field] = self.meaning
             col.add_note(note, deck['id'])
-        if 'adjective' in word_type:
+        elif 'adjective' in word_type:
+            print("adjective")
+            deck = col.decks.by_name('Genki - Adjectives')
             if word_type == 'I-adjective (keiyoushi)':
                 dict = inf.i_inflections(self.keyword)
-                deck = col.decks.by_name('Genki 1 - い adjectives')
             elif word_type == 'Na-adjective (keiyodoshi),':
                 dict = inf.na_inflections(self.keyword)
-                deck = col.decks.by_name('Genki 1 - な adjectives')
             modelAdj = col.models.by_name('Adjectives')
             col.decks.select(deck['id'])
             col.decks.current()['mid'] = modelAdj['id']
             note = col.new_note(modelAdj)
             field = 0
             for i in dict.keys():
-                note.fields[field] = dict[i]
+                note.fields[field] = fg.add_furigana(dict[i])
                 field += 1
             note.fields[field] = self.meaning
             col.add_note(note, deck['id'])
+        else:
+            print("other")
+            # chap = input('Enter vocab chapter')
+            deckVocab = col.decks.by_name('Genki - Vocab')
+            # print(deck)
+            modelVocab = col.models.by_name('Basic (and reversed card)')
+            col.decks.select(deckVocab['id'])
+            col.decks.current()['mid'] = modelVocab['id']
+            note = col.new_note(modelVocab)
+            note.fields[0] = fg.add_furigana(self.keyword)
+            note.fields[1] = self.meaning
+            col.add_note(note, deckVocab['id'])
 
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Create notes for the entered japanese vocabulary in Anki')
-    parser.add_argument('keyword', help='Keyword to create notes on')
-    parser.add_argument('meaning', help='Meaning of the keyword')
-    args = parser.parse_args()
-    p1 = CardCreator(keyword=args.keyword, meaning=args.meaning)
-    p1.create()
+    parser.add_argument('-k','--keyword', help='Keyword to create notes on')
+    parser.add_argument('-m','--meaning', help='Meaning of the keyword')
+    parser.add_argument('-f','--file',help='Input file in CSV format')
+    # args = parser.parse_args()
+    keyword = '頑張る'
+    meaning = 'To give one\'s best'
+    if keyword and meaning:
+        p1 = CardCreator(keyword=keyword, meaning=meaning)
+        p1.create()
+    elif args.file:
+        keywords = pd.read_csv(args.file)
+        print(keywords.columns)
+        for _, rows in keywords.iterrows():
+            print(rows['Keyword'],rows['Meaning'])
+            p1 = CardCreator(keyword=rows['Keyword'],meaning=rows['Meaning'])
+            p1.create()
