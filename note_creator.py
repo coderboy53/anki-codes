@@ -30,7 +30,6 @@ class CardCreator:
         # get the type of word being fetched, what verb, what adjective
         word_type = ' '.join(total_soup.find('div',{'class':'meaning-tags'}).get_text().split()[:2])
         if 'verb' in word_type:
-            print("verb")
             deck = col.decks.by_name('Genki - Verbs')
             if word_type == 'Godan verb':
                 dict = inf.godan_inflections(self.keyword)
@@ -65,9 +64,7 @@ class CardCreator:
             col.add_note(note, deck['id'])
         else:
             print("other")
-            # chap = input('Enter vocab chapter')
             deckVocab = col.decks.by_name('Genki - Vocab')
-            # print(deck)
             modelVocab = col.models.by_name('Basic (and reversed card)')
             col.decks.select(deckVocab['id'])
             col.decks.current()['mid'] = modelVocab['id']
@@ -82,11 +79,9 @@ if __name__ == '__main__':
     parser.add_argument('-k','--keyword', help='Keyword to create notes on')
     parser.add_argument('-m','--meaning', help='Meaning of the keyword')
     parser.add_argument('-f','--file',help='Input file in CSV format')
-    # args = parser.parse_args()
-    keyword = '頑張る'
-    meaning = 'To give one\'s best'
-    if keyword and meaning:
-        p1 = CardCreator(keyword=keyword, meaning=meaning)
+    args = parser.parse_args()
+    if args.keyword and args.meaning:
+        p1 = CardCreator(keyword=args.keyword, meaning=args.meaning)
         p1.create()
     elif args.file:
         keywords = pd.read_csv(args.file)
